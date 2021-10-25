@@ -16,7 +16,7 @@ const app = Vue.createApp({
         getData() {
             if (this.$refs.input.value) {
                 axios
-                    .get("http://localhost:8080/plz?plz=" + this.plz, {
+                    .get("http://localhost:8080/plz?plz=id:" + this.plz, {
                         params: {
                             param: this.plz,
                         },

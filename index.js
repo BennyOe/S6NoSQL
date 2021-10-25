@@ -56,7 +56,7 @@ rl.on("line", (line) => {
         let state = entry.state;
         console.log("PLZ is: ", id);
         client.hset(
-            "id" + id,
+            "id:" + id,
             "city",
             city,
             "loc",
