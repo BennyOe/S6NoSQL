@@ -12,7 +12,6 @@ body {
 
 #app {
   width: 400px;
-  height: 100vh;
   margin: auto;
   text-align: center;
   display: flex;
@@ -30,8 +29,8 @@ h3 {
 button {
   cursor: pointer;
   display: inline-block;
-  background: #333;
-  color: white;
+  background: #bfb15d;
+  color: black;
   font-size: 18px;
   border: 0;
   padding: 1rem 1.5rem;
@@ -60,7 +59,7 @@ input {
     border-radius:5px;
     padding: 20px;
     margin: 20px;
-    background-color: #aaaaaa;
+    background-color: #abe1fd;
   justify-content: center;
     align-items:left;
 }
