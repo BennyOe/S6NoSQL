@@ -15,12 +15,21 @@
         <form>
             <input v-model="plz" ref="input" type="text" placeholder="enter the zip-code"><br>
         </form>
-        <button @click="getData()">Search Redis</button>
-            <h3>{{city}}</h3>
-            <h3>{{state}}</h3>
-            <h3>{{error}}</h3>
+        <button @click="getCity()">Search Redis</button>
+        <h3>{{city}}</h3>
+        <h3>{{state}}</h3>
+        <h3>{{error}}</h3>
+        <form>
+            <input v-model="city" ref="input" type="text" placeholder="enter the city"><br>
+        </form>
+        <button @click="getZipCode()">Search Redis</button>
+        <ul id="example-1">
+            <li v-for="zipCode in zipCodes" >
+                {{ zipCode }}
+            </li>
+        </ul>
     </div>
-<script src="https://unpkg.com/vue@next"></script>
-            <script src="app.js"></script>
+    <script src="https://unpkg.com/vue@next"></script>
+    <script src="app.js"></script>
 </body>
 

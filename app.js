@@ -10,10 +10,11 @@ const app = Vue.createApp({
             pop: "",
             state: "",
             error: "",
+            zipCodes: [],
         };
     },
     methods: {
-        getData() {
+        getCity() {
             if (this.$refs.input.value) {
                 axios
                     .get("http://localhost:8080/plz?plz=id:" + this.plz, {
@@ -31,6 +32,26 @@ const app = Vue.createApp({
                             this.city = "";
                             this.state = "";
                             this.error = "No entry found for this zip-code";
+                        }
+                    });
+            }
+        },
+        getZipCode() {
+            if (this.$refs.input.value) {
+                axios
+                    .get("http://localhost:8080/city?city=" + this.city, {
+                        params: {
+                            param: this.city,
+                        },
+                    })
+                    .then((response) => {
+                        console.log(response);
+                        if (response.data.obj !== null) {
+                            this.error = "";
+                            this.zipCodes = response.data.obj;
+                        } else {
+                            this.zipCodes = [];
+                            this.error = "No entry found for this city";
                         }
                     });
             }

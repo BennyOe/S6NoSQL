@@ -1,15 +1,18 @@
 const redis = require("redis"); // redis in memory db
 const client = redis.createClient(); // redis client
-const fs = require("fs"); // nodejs files module
-const readline = require("readline"); // read line module
+
 const express = require("express"); // REST module
-const path = require("path"); // path module
 const router = express.Router(); //
 const app = express(); // middleware for parsing json
+
+const fs = require("fs"); // nodejs files module
+const path = require("path"); // path module for working with file and directory paths
+const readline = require("readline"); // read line module
+
 const PORT = 8080;
 
 //middleware
-app.use(express.json()); // set the middleware to parse incoming json in the body
+app.use(express.json()); // parse incoming json in the body
 app.use(express.static(__dirname)); // serves the static content
 app.use("/", router);
 
@@ -30,15 +33,24 @@ app.get(`/plz`, (req, res) => {
     });
 });
 
-// POST method
-app.post("/tshirt/:id", (req, res) => {
-    const { id } = req.params;
-    const { logo } = req.body;
-
-    res.send({
-        tshirt: `The id is ${id} and the logo is ${logo}`,
+// GET method
+app.get(`/city`, (req, res) => {
+    client.smembers(req.query.city, function (err, obj) {
+        console.log(obj);
+        res.status(200).send({
+            obj,
+        });
     });
 });
+
+// POST method
+//app.post("/plz/:id", (req, res) => {
+//const { id } = req.params;
+//const { logo } = req.body;
+//res.send({
+//tshirt: `The id is ${id} and the logo is ${logo}`,
+//});
+//});
 
 // reading the plz.data file and convert it to objects
 const rl = readline.createInterface({
@@ -55,6 +67,7 @@ rl.on("line", (line) => {
         let pop = entry.pop;
         let state = entry.state;
         console.log("PLZ is: ", id);
+        // writing the data to redis
         client.hset(
             "id:" + id,
             "city",
@@ -66,7 +79,8 @@ rl.on("line", (line) => {
             "state",
             state
         );
-        //client.zadd("cityindex", city, id);
+        // writing another index with sets of ids mapped to cities to redis
+        client.sadd(city, id);
     } catch (err) {
         console.log("Error parsing JSON string:", err);
     }
