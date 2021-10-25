@@ -19,13 +19,13 @@ app.use("/", router);
 app.listen(PORT, () => console.log(`it's alive on http://localhost:${PORT}`)); // setting up the server
 
 // sends the index.html file to the browser
-router.get("/", function (req, res) {
+router.get("/", function (_req, res) {
     res.sendFile(path.join(__dirname + "/index.html"));
 });
 
 // GET method
 app.get(`/plz`, (req, res) => {
-    client.hgetall(req.query.plz, function (err, obj) {
+    client.hgetall(req.query.plz, function (_err, obj) {
         console.log(obj);
         res.status(200).send({
             obj,
@@ -35,7 +35,7 @@ app.get(`/plz`, (req, res) => {
 
 // GET method
 app.get(`/city`, (req, res) => {
-    client.smembers(req.query.city, function (err, obj) {
+    client.smembers(req.query.city, function (_err, obj) {
         console.log(obj);
         res.status(200).send({
             obj,
@@ -66,10 +66,9 @@ rl.on("line", (line) => {
         let loc = entry.loc;
         let pop = entry.pop;
         let state = entry.state;
-        console.log("PLZ is: ", id);
         // writing the data to redis
         client.hset(
-            "id:" + id,
+            id,
             "city",
             city,
             "loc",
@@ -79,6 +78,7 @@ rl.on("line", (line) => {
             "state",
             state
         );
+
         // writing another index with sets of ids mapped to cities to redis
         client.sadd(city, id);
     } catch (err) {

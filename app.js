@@ -15,9 +15,9 @@ const app = Vue.createApp({
     },
     methods: {
         getCity() {
-            if (this.$refs.input.value) {
+            if (this.$refs.plz.value) {
                 axios
-                    .get("http://localhost:8080/plz?plz=id:" + this.plz, {
+                    .get("http://localhost:8080/plz?plz=" + this.plz, {
                         params: {
                             param: this.plz,
                         },
@@ -26,8 +26,8 @@ const app = Vue.createApp({
                         console.log(response);
                         if (response.data.obj !== null) {
                             this.error = "";
-                            this.city = "City is: " + response.data.obj.city;
-                            this.state = "State is: " + response.data.obj.state;
+                            this.city = response.data.obj.city;
+                            this.state = response.data.obj.state;
                         } else {
                             this.city = "";
                             this.state = "";
@@ -37,18 +37,23 @@ const app = Vue.createApp({
             }
         },
         getZipCode() {
-            if (this.$refs.input.value) {
+            if (this.$refs.city.value) {
                 axios
-                    .get("http://localhost:8080/city?city=" + this.city, {
-                        params: {
-                            param: this.city,
-                        },
-                    })
+                    .get(
+                        "http://localhost:8080/city?city=" +
+                            this.city.toUpperCase(),
+                        {
+                            params: {
+                                param: this.city,
+                            },
+                        }
+                    )
                     .then((response) => {
                         console.log(response);
                         if (response.data.obj !== null) {
                             this.error = "";
                             this.zipCodes = response.data.obj;
+                            this.plz = this.zipCodes[0];
                         } else {
                             this.zipCodes = [];
                             this.error = "No entry found for this city";
