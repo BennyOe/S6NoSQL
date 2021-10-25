@@ -25,12 +25,12 @@ const app = Vue.createApp({
                         console.log(response);
                         if (response.data.obj !== null) {
                             this.error = "";
-                            this.city = response.data.obj.city;
-                            this.state = response.data.obj.state;
+                            this.city = "City is: " + response.data.obj.city;
+                            this.state = "State is: " + response.data.obj.state;
                         } else {
                             this.city = "";
                             this.state = "";
-                            this.error = "Diese Postleitzahl ist ungültig.";
+                            this.error = "No entry found for this zip-code";
                         }
                     });
             }

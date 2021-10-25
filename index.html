@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>HTML 5 Boilerplate</title>
+    <title>Redis search</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
@@ -13,13 +13,12 @@
 <body>
     <div id="app">
         <form>
-            <label for="fname">PLZ:</label><br>
-            <input v-model="plz" ref="input" type="text" placeholder="enter the plz"><br>
+            <input v-model="plz" ref="input" type="text" placeholder="enter the zip-code"><br>
         </form>
-        <button @click="getData()">Show me the data!</button>
-            <h1>The City is: {{city}}</h1>
-            <h1>The State is: {{state}}</h1>
-            <h1>{{error}}</h1>
+        <button @click="getData()">Search Redis</button>
+            <h3>{{city}}</h3>
+            <h3>{{state}}</h3>
+            <h3>{{error}}</h3>
     </div>
 <script src="https://unpkg.com/vue@next"></script>
             <script src="app.js"></script>
