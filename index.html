@@ -20,7 +20,9 @@
             <button @click="getCity()">Search for city and state</button>
             <h3 v-if="city">The city is: {{city}}</h3>
             <h3 v-if="state"> The state is: {{state}}</h3>
-            <h3 v-if="error">{{error}}</h3>
+            <h3 v-if="pop"> The population is: {{pop}}</h3>
+            <h3 v-if="loc"> The location is: {{loc}}</h3>
+            <h3 v-if="plzError">{{plzError}}</h3>
         </div>
 
         <div class="bar">
@@ -30,9 +32,10 @@
             </form>
             <button @click="getZipCode()">Search for zip code</button><br>
                 <span v-if="zipCodes.length">These are the zip codes <br>{{zipCodes}}</span>
+            <h3 v-if="cityError">{{cityError}}</h3>
         </div>
-    </div>
-    <script src="https://unpkg.com/vue@next"></script>
+    </div> 
+<script src="https://unpkg.com/vue@next"></script>
     <script src="app.js"></script>
 </body>
 
