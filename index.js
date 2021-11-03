@@ -11,6 +11,9 @@ mongoClient.connect();
 mongoClient.db("db").command({ ping: 1 });
 console.log("Connected successfully to mongo server");
 
+const mongoDatabae = mongoClient.db("db");
+const plzCollection = mongoDatabae.collection("plz");
+
 const express = require("express"); // REST module
 const router = express.Router(); //
 const app = express(); // middleware for parsing json
@@ -55,8 +58,9 @@ app.get(`/redis/city`, (req, res) => {
 });
 
 // GET method for redis plz
-app.get(`/mongo/plz`, (req, res) => {
-    redisClient.hgetall(req.query.plz, function (_err, obj) {
+app.get(`/plz`, (req, res) => {
+    let query = { _id: req.query.plz };
+    plzCollection.find(query).toArray(function (_err, obj) {
         console.log(obj);
         res.status(200).send({
             obj,
@@ -65,8 +69,9 @@ app.get(`/mongo/plz`, (req, res) => {
 });
 
 // GET method for redis city
-app.get(`/mongo/city`, (req, res) => {
-    redisClient.smembers(req.query.city, function (_err, obj) {
+app.get(`/city`, (req, res) => {
+    let query = { city: req.query.city };
+    plzCollection.find(query).toArray(function (_err, obj) {
         console.log(obj);
         res.status(200).send({
             obj,
@@ -89,22 +94,8 @@ const rl = readline.createInterface({
     crlfDelay: Infinity,
 });
 
-async function letTheMongoRun() {
-    try {
-        // Connect the client to the server
-        await mongoClient.connect();
-        // Establish and verify connection
-        await mongoClient.db("admin").command({ ping: 1 });
-        console.log("Connected successfully to server");
-    } finally {
-        // Ensures that the client will close when you finish/error
-        await client.close();
-    }
-}
-
-const docs = fs.readFileSync("plz.data").toString().split("\n");
-
 async function fillDatabases() {
+    let docs = [];
     rl.on("line", async (line) => {
         try {
             const entry = JSON.parse(line);
@@ -125,6 +116,7 @@ async function fillDatabases() {
                 "state",
                 state
             );
+            docs.push(entry);
 
             // writing another index with sets of ids mapped to cities to redis
             redisClient.sadd(city, id);
@@ -132,7 +124,7 @@ async function fillDatabases() {
             console.log("Error parsing JSON string:", err);
         }
     });
-    let res = await mongoClient.db("db").collection("plz").insertMany(docs);
+    let res = await plzCollection.insertMany(docs);
     console.log(res);
 }
 
