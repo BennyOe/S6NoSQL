@@ -8,7 +8,7 @@ const mongoClient = new MongoClient(mongoURI);
 // Connect the client to the server
 mongoClient.connect();
 // Establish and verify connection
-mongoClient.db("plz").command({ ping: 1 });
+mongoClient.db("db").command({ ping: 1 });
 console.log("Connected successfully to mongo server");
 
 const express = require("express"); // REST module
@@ -102,6 +102,8 @@ async function letTheMongoRun() {
     }
 }
 
+const docs = fs.readFileSync("plz.data").toString().split("\n");
+
 async function fillDatabases() {
     rl.on("line", async (line) => {
         try {
@@ -126,16 +128,12 @@ async function fillDatabases() {
 
             // writing another index with sets of ids mapped to cities to redis
             redisClient.sadd(city, id);
-            let doc = { id: id };
-            let res = await mongoClient
-                .db("db")
-                .collection("plz")
-                .insertOne(doc);
-            console.log(res);
         } catch (err) {
             console.log("Error parsing JSON string:", err);
         }
     });
+    let res = await mongoClient.db("db").collection("plz").insertMany(docs);
+    console.log(res);
 }
 
 fillDatabases();
