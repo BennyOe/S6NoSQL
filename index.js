@@ -122,21 +122,35 @@ function fillRedis() {
             console.log("Error parsing JSON string:", err);
         }
     });
+    console.log("redis filled");
 }
 
 async function fillMongo() {
     plzCollection.deleteMany({}); // Deletes everything in the db
     let docs = fs.readFileSync("plz.data").toString().split("\n");
-    console.log(docs.length);
+    let inputArray = [];
     try {
         for (const line of docs) {
             if (line != "") {
-                await plzCollection.insertOne(JSON.parse(line));
+                let entry = JSON.parse(line);
+                inputArray.push({
+                    plz: entry._id,
+                    city: entry.city,
+                    loc: entry.loc,
+                    pop: entry.pop,
+                    state: entry.state,
+                });
             }
         }
     } catch (err) {
         console.log("Error parsing JSON string:", err);
     }
+    plzCollection.insertMany(inputArray);
+    console.log("mongo filled");
 }
+console.time("fillRedis");
 fillRedis();
+console.timeEnd("fillRedis");
+console.time("fillMongo");
 fillMongo();
+console.timeEnd("fillMongo");
