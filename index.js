@@ -94,9 +94,8 @@ const rl = readline.createInterface({
     crlfDelay: Infinity,
 });
 
-async function fillDatabases() {
-    let docs = [];
-    rl.on("line", async (line) => {
+function fillRedis() {
+    rl.on("line", (line) => {
         try {
             const entry = JSON.parse(line);
             let id = entry._id;
@@ -116,7 +115,6 @@ async function fillDatabases() {
                 "state",
                 state
             );
-            docs.push(entry);
 
             // writing another index with sets of ids mapped to cities to redis
             redisClient.sadd(city, id);
@@ -124,8 +122,21 @@ async function fillDatabases() {
             console.log("Error parsing JSON string:", err);
         }
     });
-    let res = await plzCollection.insertMany(docs);
-    console.log(res);
 }
 
-fillDatabases();
+async function fillMongo() {
+    plzCollection.deleteMany({}); // Deletes everything in the db
+    let docs = fs.readFileSync("plz.data").toString().split("\n");
+    console.log(docs.length);
+    try {
+        for (const line of docs) {
+            if (line != "") {
+                await plzCollection.insertOne(JSON.parse(line));
+            }
+        }
+    } catch (err) {
+        console.log("Error parsing JSON string:", err);
+    }
+}
+fillRedis();
+fillMongo();
