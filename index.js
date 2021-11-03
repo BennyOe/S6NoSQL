@@ -1,5 +1,15 @@
 const redis = require("redis"); // redis in memory db
-const client = redis.createClient(); // redis client
+const redisClient = redis.createClient(); // redis client
+
+const { MongoClient } = require("mongodb");
+const mongoURI = "mongodb://localhost:27017";
+const mongoClient = new MongoClient(mongoURI);
+
+// Connect the client to the server
+mongoClient.connect();
+// Establish and verify connection
+mongoClient.db("plz").command({ ping: 1 });
+console.log("Connected successfully to mongo server");
 
 const express = require("express"); // REST module
 const router = express.Router(); //
@@ -8,6 +18,7 @@ const app = express(); // middleware for parsing json
 const fs = require("fs"); // nodejs files module
 const path = require("path"); // path module for working with file and directory paths
 const readline = require("readline"); // read line module
+const { log } = require("console");
 
 const PORT = 8080;
 
@@ -23,9 +34,9 @@ router.get("/", function (_req, res) {
     res.sendFile(path.join(__dirname + "/index.html"));
 });
 
-// GET method
-app.get(`/plz`, (req, res) => {
-    client.hgetall(req.query.plz, function (_err, obj) {
+// GET method for redis plz
+app.get(`/redis/plz`, (req, res) => {
+    redisClient.hgetall(req.query.plz, function (_err, obj) {
         console.log(obj);
         res.status(200).send({
             obj,
@@ -33,9 +44,29 @@ app.get(`/plz`, (req, res) => {
     });
 });
 
-// GET method
-app.get(`/city`, (req, res) => {
-    client.smembers(req.query.city, function (_err, obj) {
+// GET method for redis city
+app.get(`/redis/city`, (req, res) => {
+    redisClient.smembers(req.query.city, function (_err, obj) {
+        console.log(obj);
+        res.status(200).send({
+            obj,
+        });
+    });
+});
+
+// GET method for redis plz
+app.get(`/mongo/plz`, (req, res) => {
+    redisClient.hgetall(req.query.plz, function (_err, obj) {
+        console.log(obj);
+        res.status(200).send({
+            obj,
+        });
+    });
+});
+
+// GET method for redis city
+app.get(`/mongo/city`, (req, res) => {
+    redisClient.smembers(req.query.city, function (_err, obj) {
         console.log(obj);
         res.status(200).send({
             obj,
@@ -58,30 +89,53 @@ const rl = readline.createInterface({
     crlfDelay: Infinity,
 });
 
-rl.on("line", (line) => {
+async function letTheMongoRun() {
     try {
-        const entry = JSON.parse(line);
-        let id = entry._id;
-        let city = entry.city;
-        let loc = entry.loc;
-        let pop = entry.pop;
-        let state = entry.state;
-        // writing the data to redis
-        client.hset(
-            id,
-            "city",
-            city,
-            "loc",
-            JSON.stringify(loc),
-            "pop",
-            pop,
-            "state",
-            state
-        );
-
-        // writing another index with sets of ids mapped to cities to redis
-        client.sadd(city, id);
-    } catch (err) {
-        console.log("Error parsing JSON string:", err);
+        // Connect the client to the server
+        await mongoClient.connect();
+        // Establish and verify connection
+        await mongoClient.db("admin").command({ ping: 1 });
+        console.log("Connected successfully to server");
+    } finally {
+        // Ensures that the client will close when you finish/error
+        await client.close();
     }
-});
+}
+
+async function fillDatabases() {
+    rl.on("line", async (line) => {
+        try {
+            const entry = JSON.parse(line);
+            let id = entry._id;
+            let city = entry.city;
+            let loc = entry.loc;
+            let pop = entry.pop;
+            let state = entry.state;
+            // writing the data to redis
+            redisClient.hset(
+                id,
+                "city",
+                city,
+                "loc",
+                JSON.stringify(loc),
+                "pop",
+                pop,
+                "state",
+                state
+            );
+
+            // writing another index with sets of ids mapped to cities to redis
+            redisClient.sadd(city, id);
+            let doc = { id: id };
+            let res = await mongoClient
+                .db("db")
+                .collection("plz")
+                .insertOne(doc);
+            console.log(res);
+        } catch (err) {
+            console.log("Error parsing JSON string:", err);
+        }
+    });
+}
+
+fillDatabases();
