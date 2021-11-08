@@ -85,7 +85,6 @@ const app = Vue.createApp({
                         },
                     })
                     .then((response) => {
-                        console.log(response);
                         if (response.data.obj !== null) {
                             this.moPlzError = "";
                             this.moCity = response.data.obj.city;
@@ -124,7 +123,6 @@ const app = Vue.createApp({
                             this.moState = "";
                             this.moPop = "";
                             this.moLoc = "";
-                            console.log(this.moZipCodes);
                         } else {
                             this.moZipCodes = [];
                             this.moCityError = "No entry found for this city";
