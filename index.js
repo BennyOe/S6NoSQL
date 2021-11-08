@@ -57,10 +57,11 @@ app.get(`/redis/city`, (req, res) => {
     });
 });
 
-// GET method for redis plz
-app.get(`/plz`, (req, res) => {
-    let query = { _id: req.query.plz };
-    plzCollection.find(query).toArray(function (_err, obj) {
+// GET method for mongo plz
+app.get(`/mo/plz`, (req, res) => {
+    let query = { plz: req.query.plz };
+    console.log(query);
+    plzCollection.findOne(query, function (_err, obj) {
         console.log(obj);
         res.status(200).send({
             obj,
@@ -68,8 +69,8 @@ app.get(`/plz`, (req, res) => {
     });
 });
 
-// GET method for redis city
-app.get(`/city`, (req, res) => {
+// GET method for mongo city
+app.get(`/mo/city`, (req, res) => {
     let query = { city: req.query.city };
     plzCollection.find(query).toArray(function (_err, obj) {
         console.log(obj);

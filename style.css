@@ -11,7 +11,6 @@ body {
 }
 
 #app {
-  width: 400px;
   margin: auto;
   text-align: center;
   display: flex;
@@ -55,13 +54,18 @@ input {
 }
 
 .bar {
-    width: 600px;
     border-radius:5px;
     padding: 20px;
     margin: 20px;
     background-color: #abe1fd;
   justify-content: center;
     align-items:left;
+}
+
+.dbwrapper {
+    background-color: #ed6f00;
+    margin-top: 20px;
+    padding: 5px;
 }
 
 ul{
