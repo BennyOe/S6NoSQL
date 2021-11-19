@@ -10,3 +10,8 @@ services:
     container_name: our-mongodb
     ports:
       - "27017:27017"
+  cassandra:
+    image: cassandra
+    container_name: our-cassandra
+    ports:
+      - "9042:9042"
