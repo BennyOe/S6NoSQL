@@ -236,14 +236,33 @@ fillMongo();
 console.timeEnd("fillMongo");
 //
 // CASSANDRA QUERY
-const createKeySpace = "CREATE KEYSPACE IF NOT EXISTS plz WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 3 }; ";
-const createTable = "CREATE TABLE IF NOT EXISTS plz.data ( zip text PRIMARY KEY, city text, loc list <float>, pop int, state text); ";
+const createKeySpace = "CREATE KEYSPACE IF NOT EXISTS plz WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 3 };";
+const createTable = "CREATE TABLE IF NOT EXISTS plz.data ( zip text PRIMARY KEY, city text, loc list <float>, pop int, state text);";
+const createColumn = "ALTER TABLE plz.data ADD Fussball text;"
+let getZIP = 'SELECT * FROM plz.data WHERE city = ? ALLOW FILTERING'
+const updateFussball = "UPDATE plz.data SET Fussball = 'Ja' WHERE zip IN ?;"
+const cities = ['BREMEN', 'HAMBURG'];
 
 // Thank you js for this fucking bullshit
 (async () => {
-    let resKeySpace = await client.execute(createKeySpace)
-    console.log(resKeySpace)
-    let resTable = await client.execute(createTable)
-    console.log(resTable)
-    fillCassandra()
+    await client.execute(createKeySpace)
+    await client.execute(createTable)
+    await client.execute(createColumn)
+    await fillCassandra()
+    let plzs = []
+    let res1 = await client.execute(getZIP, [cities[0]], {
+        prepare: true
+    })
+    let res2 = await client.execute(getZIP, [cities[1]], {
+        prepare: true
+    })
+    for (const row of res1) {
+        plzs.push(row.zip)
+    }
+    for (const row of res2) {
+        plzs.push(row.zip)
+    }
+    client.execute(updateFussball, [plzs], {
+        prepare: true
+    })
 })();
