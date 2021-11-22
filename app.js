@@ -21,6 +21,15 @@ const app = Vue.createApp({
             moCityError: "",
             moPlzError: "",
             moZipCodes: [],
+
+            cassPlz: "",
+            cassCity: "",
+            cassLoc: "",
+            cassPop: "",
+            cassState: "",
+            cassCityError: "",
+            cassPlzError: "",
+            cassZipCodes: [],
         };
     },
     methods: {
@@ -138,12 +147,13 @@ const app = Vue.createApp({
                         },
                     })
                     .then((response) => {
-                        if (response.data.obj !== null) {
+                        // console.log(response.data.resSet)
+                        if (response.data.resSet !== null) {
                             this.cassPlzError = "";
-                            this.cassCity = response.data.obj.city;
-                            this.cassState = response.data.obj.state;
-                            this.cassPop = response.data.obj.pop;
-                            this.cassLoc = response.data.obj.loc;
+                            this.cassCity = response.data.resSet.city;
+                            this.cassState = response.data.resSet.state;
+                            this.cassPop = response.data.resSet.pop;
+                            this.cassLoc = response.data.resSet.loc;
                         } else {
                             this.cassCity = "";
                             this.cassState = "";
@@ -152,6 +162,7 @@ const app = Vue.createApp({
                     });
             }
         },
+
         cassGetZipCode() {
             if (this.$refs.cassCity.value) {
                 axios
@@ -164,12 +175,12 @@ const app = Vue.createApp({
                         }
                     )
                     .then((response) => {
-                        //console.log(response);
-                        if (response.data.obj.length != 0) {
+                        console.log(response);
+                        if (response.data.resSet != null) {
                             this.cassCityError = "";
                             this.cassZipCodes = [];
-                            for (let i = 0; i < response.data.obj.length; i++) {
-                                this.cassZipCodes.push(response.data.obj[i].plz);
+                            for (let i = 0; i < response.data.resSet.length; i++) {
+                                this.cassZipCodes.push(response.data.resSet[i].zip);
                             }
                             this.cassPlz = this.cassZipCodes[0];
                             this.cassState = "";

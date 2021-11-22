@@ -113,14 +113,42 @@ app.get(`/mo/city`, (req, res) => {
     console.timeEnd('mongo');
 });
 
-// POST method
-//app.post("/plz/:id", (req, res) => {
-//const { id } = req.params;
-//const { logo } = req.body;
-//res.send({
-//tshirt: `The id is ${id} and the logo is ${logo}`,
-//});
-//});
+
+// GET method for cassandra plz
+app.get(`/cass/plz`, (req, res) => {
+    console.log("CASSANDRA PLZ Time: ");
+    console.time('cassandra');
+    let query = 'SELECT * FROM plz.data WHERE zip = ?'
+    console.log(query);
+    client.execute(query, [req.query.plz], {
+        prepare: true
+    }, function(_err, obj) {
+        console.log(obj.first());
+        resSet = obj.first()
+        res.status(200).send({
+            resSet,
+        });
+    });
+    console.timeEnd('cassandra');
+});
+
+// GET method for cassandra city
+app.get(`/cass/city`, (req, res) => {
+    console.log("CASSANDRA City Time: ");
+    console.time('cassandra');
+    let query = 'SELECT * FROM plz.data WHERE city = ? ALLOW FILTERING'
+    client.execute(query, [req.query.city], {
+        prepare: true
+    }, function(_err, obj) {
+        console.log(obj.rows)
+        // console.log(obj.first());
+        resSet = obj.rows
+        res.status(200).send({
+            "resSet": resSet
+        });
+    });
+    console.timeEnd('cassandra');
+});
 
 // reading the plz.data file and convert it to objects
 const rl = readline.createInterface({
@@ -186,7 +214,6 @@ async function fillMongo() {
 async function fillCassandra() {
     console.time("fillCassandra");
     let docs = fs.readFileSync("plz.data").toString().split("\n");
-    let inputArray = [];
     try {
         for (const line of docs) {
             if (line != "") {
@@ -209,9 +236,14 @@ fillMongo();
 console.timeEnd("fillMongo");
 //
 // CASSANDRA QUERY
-const createKeySpace = "CREATE KEYSPACE IF NOT EXISTS plz WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 3 };";
-const useKeySpace = "USE plz"
-const createTable = "CREATE TABLE IF NOT EXISTS plz.data ( zip text PRIMARY KEY, city text, loc list <float>, pop int, state text);";
+const createKeySpace = "CREATE KEYSPACE IF NOT EXISTS plz WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 3 }; ";
+const createTable = "CREATE TABLE IF NOT EXISTS plz.data ( zip text PRIMARY KEY, city text, loc list <float>, pop int, state text); ";
 
-
-client.execute(createKeySpace).then(client.execute(useKeySpace)).then(client.execute(createTable)).then(fillCassandra());
+// Thank you js for this fucking bullshit
+(async () => {
+    let resKeySpace = await client.execute(createKeySpace)
+    console.log(resKeySpace)
+    let resTable = await client.execute(createTable)
+    console.log(resTable)
+    fillCassandra()
+})();

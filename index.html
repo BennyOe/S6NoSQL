@@ -69,7 +69,7 @@
             <div class="bar">
                 <h3>Know the zip code?</h3>
                 <form>
-                    <input v-model="casPLZ" ref="casPLZ" type="text" placeholder="enter the zip-code"><br>
+                    <input v-model="cassPlz" ref="cassPlz" type="text" placeholder="enter the zip-code"><br>
                 </form>
                 <button @click="cassGetCity()">Search for city and state</button>
                 <h3 v-if="cassCity">The city is: {{cassCity}}</h3>
