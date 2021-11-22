@@ -53,8 +53,7 @@ const app = Vue.createApp({
                 axios
                     .get(
                         "http://localhost:8080/redis/city?city=" +
-                            this.redisCity.toUpperCase(),
-                        {
+                        this.redisCity.toUpperCase(), {
                             params: {
                                 param: this.redisCity,
                             },
@@ -104,8 +103,7 @@ const app = Vue.createApp({
                 axios
                     .get(
                         "http://localhost:8080/mo/city?city=" +
-                            this.moCity.toUpperCase(),
-                        {
+                        this.moCity.toUpperCase(), {
                             params: {
                                 param: this.moCity,
                             },
@@ -116,7 +114,7 @@ const app = Vue.createApp({
                         if (response.data.obj.length != 0) {
                             this.moCityError = "";
                             this.moZipCodes = [];
-                            for(let i=0;i<response.data.obj.length;i++){
+                            for (let i = 0; i < response.data.obj.length; i++) {
                                 this.moZipCodes.push(response.data.obj[i].plz);
                             }
                             this.moPlz = this.moZipCodes[0];
@@ -126,6 +124,60 @@ const app = Vue.createApp({
                         } else {
                             this.moZipCodes = [];
                             this.moCityError = "No entry found for this city";
+                        }
+                    });
+            }
+        },
+
+        cassGetCity() {
+            if (this.$refs.cassPlz.value) {
+                axios
+                    .get("http://localhost:8080/cass/plz?plz=" + this.cassPlz, {
+                        params: {
+                            param: this.cassPlz,
+                        },
+                    })
+                    .then((response) => {
+                        if (response.data.obj !== null) {
+                            this.cassPlzError = "";
+                            this.cassCity = response.data.obj.city;
+                            this.cassState = response.data.obj.state;
+                            this.cassPop = response.data.obj.pop;
+                            this.cassLoc = response.data.obj.loc;
+                        } else {
+                            this.cassCity = "";
+                            this.cassState = "";
+                            this.cassPlzError = "No entry found for this zip-code";
+                        }
+                    });
+            }
+        },
+        cassGetZipCode() {
+            if (this.$refs.cassCity.value) {
+                axios
+                    .get(
+                        "http://localhost:8080/cass/city?city=" +
+                        this.cassCity.toUpperCase(), {
+                            params: {
+                                param: this.cassCity,
+                            },
+                        }
+                    )
+                    .then((response) => {
+                        //console.log(response);
+                        if (response.data.obj.length != 0) {
+                            this.cassCityError = "";
+                            this.cassZipCodes = [];
+                            for (let i = 0; i < response.data.obj.length; i++) {
+                                this.cassZipCodes.push(response.data.obj[i].plz);
+                            }
+                            this.cassPlz = this.cassZipCodes[0];
+                            this.cassState = "";
+                            this.cassPop = "";
+                            this.cassLoc = "";
+                        } else {
+                            this.cassZipCodes = [];
+                            this.cassCityError = "No entry found for this city";
                         }
                     });
             }

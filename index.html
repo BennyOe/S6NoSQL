@@ -63,8 +63,33 @@
                 <h3 v-if="moPlz">{{moCityError}}</h3>
             </div>
         </div>
+
+        <div class="dbwrapper">
+            <h2>Cassandra</h2>
+            <div class="bar">
+                <h3>Know the zip code?</h3>
+                <form>
+                    <input v-model="casPLZ" ref="casPLZ" type="text" placeholder="enter the zip-code"><br>
+                </form>
+                <button @click="cassGetCity()">Search for city and state</button>
+                <h3 v-if="cassCity">The city is: {{cassCity}}</h3>
+                <h3 v-if="cassState"> The state is: {{cassState}}</h3>
+                <h3 v-if="cassPop"> The population is: {{cassPop}}</h3>
+                <h3 v-if="cassLoc"> The location is: {{cassLoc}}</h3>
+                <h3 v-if="cassPlzError">{{cassPlzError}}</h3>
+            </div>
+
+            <div class="bar">
+                <h3>Know the name of the city?</h3>
+                <form>
+                    <input v-model="cassCity" ref="cassCity" type="text" placeholder="enter the city"><br>
+                </form>
+                <button @click="cassGetZipCode()">Search for zip code</button><br>
+                <span v-if="cassZipCodes.length">These are the zip codes <br>{{cassZipCodes}}</span>
+                <h3 v-if="cassPlz">{{cassCityError}}</h3>
+            </div>
+        </div>
     </div>
     <script src="https://unpkg.com/vue@next"></script>
     <script src="app.js"></script>
 </body>
-
